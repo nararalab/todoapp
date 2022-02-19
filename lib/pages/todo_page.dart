@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/todo_model.dart';
 import '../providers/providers.dart';
 
 class TodoPage extends StatefulWidget {
@@ -22,9 +23,11 @@ class _TodoPageState extends State<TodoPage> {
               vertical: 40.0,
             ),
             child: Column(
-              children: [
-                const TodoHeader(),
+              children: const [
+                TodoHeader(),
                 CreateTodo(),
+                SizedBox(height: 20.0),
+                SearchAndFilterTodo(),
               ],
             ),
           ),
@@ -82,5 +85,63 @@ class _CreateTodoState extends State<CreateTodo> {
             newTodoController.clear();
           }
         });
+  }
+}
+
+class SearchAndFilterTodo extends StatelessWidget {
+  const SearchAndFilterTodo({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(
+          decoration: const InputDecoration(
+            labelText: '검색',
+            border: InputBorder.none,
+            filled: true,
+            prefixIcon: Icon(Icons.search),
+          ),
+          onChanged: (String? newSearchTerm) {
+            if (newSearchTerm != null) {
+              context.read<TodoSearch>().setSearchTerm(newSearchTerm);
+            }
+          },
+        ),
+        const SizedBox(height: 30.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            filterButton(context, Filter.all),
+            filterButton(context, Filter.active),
+            filterButton(context, Filter.completed),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget filterButton(BuildContext context, Filter filter) {
+    return TextButton(
+      onPressed: () {
+        context.read<TodoFilter>().changeFilter(filter);
+      },
+      child: Text(
+        filter == Filter.all
+            ? 'All'
+            : filter == Filter.active
+                ? 'Active'
+                : 'completed',
+        style: TextStyle(
+          fontSize: 18.0,
+          color: textColor(context, filter),
+        ),
+      ),
+    );
+  }
+
+  Color textColor(BuildContext context, Filter filter) {
+    final currentFilter = context.watch<TodoFilter>().state.filter;
+    return currentFilter == filter ? Colors.blue : Colors.grey;
   }
 }
