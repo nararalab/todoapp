@@ -41,6 +41,8 @@ class TodoList with ChangeNotifier {
     final newTodos = [..._state.todos, newTodo];
 
     _state = _state.copyWith(todos: newTodos);
+    //디버깅
+    print(_state);
     notifyListeners();
   }
 
