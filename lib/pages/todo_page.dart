@@ -174,7 +174,7 @@ class ShowTodos extends StatelessWidget {
       shrinkWrap: true,
       itemCount: todos.length,
       separatorBuilder: (BuildContext context, int index) {
-        return Divider(color: Colors.grey);
+        return const Divider(color: Colors.grey);
       },
       itemBuilder: (BuildContext context, int index) {
         return Dismissible(
@@ -225,9 +225,69 @@ class TodoItem extends StatefulWidget {
 }
 
 class _TodoItemState extends State<TodoItem> {
+  late final TextEditingController textEditingController;
+
+  @override
+  void initState() {
+    super.initState();
+    textEditingController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            bool _error = false;
+            textEditingController.text = widget.todo.desc;
+
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return AlertDialog(
+                  title: const Text('수정'),
+                  content: TextField(
+                    controller: textEditingController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      errorText: _error ? '널' : null,
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('취소'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _error =
+                              textEditingController.text.isEmpty ? true : false;
+                          if (!_error) {
+                            context.read<TodoList>().editTodo(
+                                  widget.todo.id,
+                                  textEditingController.text,
+                                );
+                            Navigator.pop(context);
+                          }
+                        });
+                      },
+                      child: const Text('수정'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
       leading: Checkbox(
         value: widget.todo.completed,
         onChanged: (bool? checked) {
