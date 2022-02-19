@@ -181,12 +181,60 @@ class ShowTodos extends StatelessWidget {
           key: ValueKey(todos[index].id),
           background: showBackground(0),
           secondaryBackground: showBackground(1),
-          child: Text(
-            todos[index].desc,
-            style: const TextStyle(fontSize: 20.0),
-          ),
+          onDismissed: (_) {
+            context.read<TodoList>().removeTodo(todos[index]);
+          },
+          confirmDismiss: (_) {
+            return showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('경고'),
+                    content: const Text('삭제할까요?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('아니요'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('네'),
+                      ),
+                    ],
+                  );
+                });
+          },
+          child: TodoItem(todo: todos[index]),
         );
       },
+    );
+  }
+}
+
+class TodoItem extends StatefulWidget {
+  final Todo todo;
+
+  const TodoItem({
+    Key? key,
+    required this.todo,
+  }) : super(key: key);
+
+  @override
+  State<TodoItem> createState() => _TodoItemState();
+}
+
+class _TodoItemState extends State<TodoItem> {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Checkbox(
+        value: widget.todo.completed,
+        onChanged: (bool? checked) {
+          context.read<TodoList>().toggleTodo(widget.todo.id);
+        },
+      ),
+      title: Text(widget.todo.desc),
     );
   }
 }
