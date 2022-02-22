@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class Debounce {
   final int milliseconds;
   Debounce({
-    required this.milliseconds,
+    this.milliseconds = 500,
   });
 
   Timer? _timer;

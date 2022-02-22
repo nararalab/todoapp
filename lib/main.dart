@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:provider/provider.dart';
 
 import 'pages/todo_page.dart';
@@ -15,35 +16,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<TodoFilter>(
+        StateNotifierProvider<TodoFilter, TodoFilterState>(
           create: (context) => TodoFilter(),
         ),
-        ChangeNotifierProvider<TodoSearch>(
+        StateNotifierProvider<TodoSearch, TodoSearchState>(
           create: (context) => TodoSearch(),
         ),
-        ChangeNotifierProvider<TodoList>(
+        StateNotifierProvider<TodoList, TodoListState>(
           create: (context) => TodoList(),
         ),
-        ChangeNotifierProxyProvider<TodoList, ActiveTodoCount>(
+        StateNotifierProvider<ActiveTodoCount, ActiveTodoCountState>(
           create: (context) => ActiveTodoCount(),
-          update: (
-            BuildContext context,
-            TodoList todoList,
-            ActiveTodoCount? activeTodoCount,
-          ) =>
-              activeTodoCount!..update(todoList),
         ),
-        ChangeNotifierProxyProvider3<TodoFilter, TodoSearch, TodoList,
-            FilteredTodos>(
+        StateNotifierProvider<FilteredTodos, FilteredTodosState>(
           create: (context) => FilteredTodos(),
-          update: (
-            BuildContext context,
-            TodoFilter todoFilter,
-            TodoSearch todoSearch,
-            TodoList todoList,
-            FilteredTodos? filteredTodos,
-          ) =>
-              filteredTodos!..update(todoFilter, todoSearch, todoList),
         ),
       ],
       child: MaterialApp(
